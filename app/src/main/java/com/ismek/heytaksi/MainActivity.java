@@ -4,6 +4,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -35,6 +36,8 @@ import com.ismek.ws.ApiClient;
 import com.ismek.ws.HeyTaksiRest;
 
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,6 +53,11 @@ public class MainActivity extends AppCompatActivity
 
     GoogleApiClient googleApiClient;
     Location lastLocation;
+
+    Timer timer;
+    TimerTask timerTask;
+
+    final Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +111,18 @@ public class MainActivity extends AppCompatActivity
                     .build();
         }
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startTimer();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stoptimertask();
     }
 
     @Override
@@ -257,6 +277,46 @@ public class MainActivity extends AppCompatActivity
 
             }
         });
+    }
+
+    public void startTimer() {
+        timer = new Timer();
+        initializeTimerTask();
+        timer.schedule(timerTask, 5000, 20000);
+    }
+
+    public void stoptimertask() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+    }
+
+    public void initializeTimerTask() {
+
+        timerTask = new TimerTask() {
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        if ( Build.VERSION.SDK_INT >= 23 &&
+                                ContextCompat.checkSelfPermission( MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED &&
+                                ContextCompat.checkSelfPermission( MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(MainActivity.this,
+                                    new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                                    1);
+                            return  ;
+                        }
+                        lastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                                googleApiClient);
+                        if (lastLocation != null) {
+                            Log.d("YAHHH",lastLocation.getLatitude() + " / " + lastLocation.getLongitude());
+                            if ("T".equals(loginResponse.userType))
+                                sendGPSToServer(lastLocation);
+                        }
+                    }
+                });
+            }
+        };
     }
 
 
