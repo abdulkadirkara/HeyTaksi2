@@ -12,6 +12,7 @@ import android.widget.RadioGroup;
 import com.ismek.entity.BaseReturn;
 import com.ismek.entity.LoginResponse;
 import com.ismek.util.ProjectPreferences;
+import com.ismek.util.SharedPreferenceUtils;
 import com.ismek.ws.ApiClient;
 import com.ismek.ws.HeyTaksiRest;
 
@@ -95,6 +96,7 @@ public class SignInActivity extends AppCompatActivity {
         user.phone = edPhone.getText().toString();
         user.userType = userType;
         user.plate = edPlate.getText().toString();
+        user.regId = SharedPreferenceUtils.getInstance(SignInActivity.this).getStringValue("FCM_ID","");
 
         HeyTaksiRest iService = ApiClient.getClient().create(HeyTaksiRest.class);
         Call<BaseReturn<String>> call = iService.signIn(user);
@@ -103,7 +105,7 @@ public class SignInActivity extends AppCompatActivity {
             public void onResponse(Call<BaseReturn<String>> call, Response<BaseReturn<String>> response) {
                 pDialog.dismiss();
                 BaseReturn<String> result = response.body();
-                if (result.result){
+                if (result != null && result.result){
                     new SweetAlertDialog(SignInActivity.this, SweetAlertDialog.SUCCESS_TYPE)
                             .setTitleText("")
                             .setContentText(result.message)

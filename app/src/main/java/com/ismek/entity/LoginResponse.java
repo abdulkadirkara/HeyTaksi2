@@ -16,6 +16,7 @@ public class LoginResponse implements Parcelable {
     public String plate;
     public String phone;
     public String userType;
+    public String regId;
 
 
     @Override
@@ -34,6 +35,7 @@ public class LoginResponse implements Parcelable {
         dest.writeString(this.plate);
         dest.writeString(this.phone);
         dest.writeString(this.userType);
+        dest.writeString(this.regId);
     }
 
     public LoginResponse() {
@@ -50,6 +52,7 @@ public class LoginResponse implements Parcelable {
         this.plate = in.readString();
         this.phone = in.readString();
         this.userType = in.readString();
+        this.regId = in.readString();
     }
 
     public static final Creator<LoginResponse> CREATOR = new Creator<LoginResponse>() {

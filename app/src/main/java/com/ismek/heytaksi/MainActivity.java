@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.ismek.entity.ActiveLocationInfo;
 import com.ismek.entity.BaseReturn;
 import com.ismek.entity.LoginResponse;
@@ -63,6 +64,8 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        FirebaseMessaging.getInstance().subscribeToTopic("heytaksi");
 
         prefUtil = new SharedPreferenceUtils(MainActivity.this);
 
@@ -318,6 +321,5 @@ public class MainActivity extends AppCompatActivity
             }
         };
     }
-
 
 }
